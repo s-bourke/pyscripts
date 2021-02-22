@@ -38,8 +38,7 @@ def kill_container(name):
 def start_container(name, restart='no', ports=None):
 	portsString = ' '.join('-p ' + port for port in ports)
 	kill_container(name)
-	_pt.cli.run_pipe(f"docker run --restart {restart} --name {name} -d {name}")
-	output=pt.cli.run_pipe(f"docker run --restart {restart} --name {name} {portsString} -d {name}")
+	_pt.cli.run_pipe(f"docker run --restart {restart} --name {name} {portsString} -d {name}")
 
 
 def remove_image(name):
