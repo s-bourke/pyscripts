@@ -1,5 +1,4 @@
 import os
-
 from rich.console import Console
 from rich.live import Live
 
@@ -10,14 +9,6 @@ console = Console()
 
 def build_docker_image(name, path=os.getcwd()):
 	return pt.cli.run_pipe(f'docker build -t={name} .', cwd=path)
-
-
-def build_database_image(name):
-	with console.status(f"[bold yellow] Building image [blue]{name}[/blue]...[/bold yellow]"):
-		output = build_docker_image('/home/sam/Workspace/' + name, name)
-		console.log(f"[bold green]Image [blue]{name}[/blue] built.")
-	return output
-
 
 def does_container_exist(name):
 	output = pt.cli.run_pipe(f"docker ps --all --format {{{{.Names}}}}")
@@ -38,9 +29,10 @@ def kill_container(name):
 		pt.cli.run_pipe(f"docker rm {name}")
 
 
-def start_container(name, restart='no'):
+def start_container(name, restart='no', ports=None):
+	portsString = ' '.join('-p ' + port for port in ports)
 	kill_container(name)
-	pt.cli.run_pipe(f"docker run --restart {restart} --name {name} -d {name}")
+	output=pt.cli.run_pipe(f"docker run --restart {restart} --name {name} {portsString} -d {name}")
 
 
 def remove_image(name):
