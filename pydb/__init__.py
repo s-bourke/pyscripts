@@ -1,11 +1,10 @@
 import json
 
 import mysql.connector
-from rich.console import Console
 from rich.progress import Progress
-from rich.table import Table
 
 import pyfiletools as ft
+import pytools as pt
 from pydb.QueryResult import QueryResult
 
 __connectors = {}
@@ -55,21 +54,14 @@ def query(query_string, connection=None, limit=None):
 	return result
 
 
-def query_table(query_string, connection=None, limit=None):
+def query_table(query_string, connection=None, limit=None, title=None, headers=None):
 	result = query(query_string, connection, limit)
-	table = Table()
-
-	for column in result.headers:
-		table.add_column(column)
-
-	for row in result.data:
-		table.add_row(*map(str, row))
-
-	return table
+	return pt.display.table(headers or result.headers, list(result.data), title=title)
 
 
-def query_formatted(query_string, connection=None, limit=None):
-	Console().print(query_table(query_string, connection, limit))
+def query_formatted(query_string, connection=None, limit=None, title=None, headers=None):
+	result = query(query_string, connection, limit)
+	return pt.display.display_table(headers or result.headers, list(result.data), title=title)
 
 
 def copy_data(table, source, dest, suffix=None, full_query=None, task=None, progress=None):
@@ -91,14 +83,13 @@ def copy_data(table, source, dest, suffix=None, full_query=None, task=None, prog
 		for x in range(len(chunkyList)):
 			thing.executemany(f"INSERT INTO {table} {insertHeaders} values {placeholder}", chunkyList[x])
 			if progress is not None:
-				progress.update(task, advance=100/len(chunkyList))
+				progress.update(task, advance=100 / len(chunkyList))
 	if progress is not None:
 		progress.update(task, completed=100)
 	thing.close()
 
 
 def copy_group_data(tables, source, dest):
-
 	stringlen = len(max(tables, key=len))
 
 	for table in reversed(tables):
