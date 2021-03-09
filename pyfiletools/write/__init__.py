@@ -5,7 +5,7 @@ def file(filename, values=None, separator=","):
 	values: array of data values ([[item1,item2, ...],[item3, item4, ...], ...])
 	"""
 	if values is None:
-		values=[]
+		values = []
 	f = open(filename, "w")
 	for i in range(0, len(values)):
 		for j in range(0, len(values[i])):

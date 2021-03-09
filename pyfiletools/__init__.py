@@ -1,5 +1,5 @@
-import pyfiletools.parse
 import pyfiletools.load
+import pyfiletools.parse
 import pyfiletools.write
 
 

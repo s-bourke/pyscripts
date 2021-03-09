@@ -1,5 +1,6 @@
 import pyfiletools as ft
 
+
 def file(filename):
 	"""
 	Load data from file into array line by line.

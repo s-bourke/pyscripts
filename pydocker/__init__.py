@@ -31,7 +31,7 @@ def is_container_running(name):
 
 
 def kill_container(name):
-	if (is_container_running(name)):
+	if is_container_running(name):
 		_pt.cli.run_pipe(f"docker kill {name}")
 		_pt.cli.run_pipe(f"docker rm {name}")
 

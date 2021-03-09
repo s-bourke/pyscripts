@@ -6,4 +6,3 @@ class ColumnDefinition:
 		self.cell_style_context = cell_style_context
 		self.justify = justify
 		self.width = width
-
