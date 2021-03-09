@@ -1,4 +1,7 @@
 # Functions
+from datetime import datetime, timedelta
+
+import dateutil.parser
 from rich import box
 from rich.console import Console
 from rich.table import Table
@@ -15,7 +18,7 @@ def table(headers, rows, title=None):
 		if not isinstance(column, ColumnDefinition):
 			table.add_column(column, justify="left")
 		else:
-			table.add_column(column.header)
+			table.add_column(column.header, width=column.width, justify=column.justify)
 	for row in rows:
 		table.add_row(*map(str, __format_row(list(row), headers)), )
 	return table
@@ -35,14 +38,16 @@ def __format_value(value, column):
 	if value is None:
 		return __null_cell_style
 	if not isinstance(column, ColumnDefinition) or column.cell_style is None:
-		return value
+		return __default_cell_style + str(value)
 	if column.cell_style == "standard":
 		return f"[{column.cell_style_context}]{value}"
 	if column.cell_style == "pos_nev_num":
 		return __apply_pos_nev_num(value)
 	if column.cell_style == "conditional":
 		return __apply_conditional(value, column.cell_style_context)
-	return value
+	if column.cell_style == "age_warning":
+		return __apply_age_warning(value, column.cell_style_context)
+	return __default_cell_style + str(value)
 
 
 def __apply_pos_nev_num(value):
@@ -57,3 +62,11 @@ def __apply_conditional(value, context):
 	if str(value) in context:
 		return f"[{context[str(value)]}]{value}"
 	return __default_cell_style + str(value)
+
+
+def __apply_age_warning(value, context):
+	if dateutil.parser.isoparse(value) < datetime.now() - timedelta(days=int(context.split(":")[1])):
+		return f"[red]{value}"
+	if dateutil.parser.isoparse(value) < datetime.now() - timedelta(days=int(context.split(":")[0])):
+		return f"[yellow]{value}"
+	return f"[green]{value}"
