@@ -1,5 +1,6 @@
 from jira import JIRA
 
+from pytools.cli import run_pipe
 from pytools.display import ColumnDefinition, display_table
 
 __headers = [
@@ -20,7 +21,8 @@ def __issue_to_table_row(issues):
 
 
 def search(query):
-	jira = JIRA("https://costcutter.jira.com/", basic_auth=('sam.bourke@costcutter.com', 'vhdQoeyUm3pg3OwnBxkp729C'))
+	token = run_pipe("cat secret", cwd="/home/sam/.jira.d").split("=", 1)[1]
+	jira = JIRA("https://costcutter.jira.com/", basic_auth=('sam.bourke@costcutter.com', token))
 	return jira.search_issues(query)
 
 
