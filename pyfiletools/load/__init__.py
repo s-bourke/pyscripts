@@ -3,7 +3,8 @@ import pyfiletools as ft
 def file(filename):
 	"""
 	Load data from file into array line by line.
-	filename: string pointing to file relative to current directory
+	:param filename: string pointing to file relative to current directory
+	:return: The content of the file as a list of strings
 	"""
 	with open(filename) as f:
 		content = f.readlines()
