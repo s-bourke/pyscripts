@@ -66,8 +66,7 @@ def start_container(name, restart='no', ports=None):
 	Start a container. If container is already running, kill it and start a new one
 	:param name: Name of the container
 	:param restart: Restart policy. By default "No". https://docs.docker.com/engine/reference/run/#restart-policies---restart
-	TODO: Finish this
-	:param ports: The ports to expose as list. E.g [""]
+	:param ports: The ports to expose as list. E.g ["22060:3306"]
 	"""
 	ports_string = ' '.join('-p ' + port for port in ports)
 	kill_container(name)
