@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+import pydb as db
+
+# List of tables to populate. Should be in insert order
+franchise_tables = [
+	"franman.regions",
+	"franman.areas",
+	"franman.addresses",
+	"franman.shops",
+	"franman.retail_organisations",
+	"franman.banks",
+	"franman.franchises",
+	"suppliers.suppliers",
+	"billing.week_numbers",
+	"billing.invoice_types",
+	"billing.invoice_statuses",
+	"billing.invoice_headers",
+	"billing.invoice_lines",
+	"billing.inv_hdr_vat_rates",
+	"billing.edi_invoice_headers",
+	"billing.edi_invoice_lines",
+	"billing.edi_inv_hdr_vat_rates"
+]
+
+db.copy_group_data(franchise_tables, "bootham", "docker")

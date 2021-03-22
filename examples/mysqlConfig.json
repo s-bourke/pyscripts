@@ -1,0 +1,16 @@
+[
+  {
+    "name": "docker",
+    "host": "localhost",
+    "port": "33060",
+    "user": "user",
+    "password" : "password"
+  },
+  {
+    "name": "bootham",
+    "host": "url",
+    "port": "3306",
+    "user":"user",
+    "password":"password!"
+  }
+]

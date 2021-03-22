@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+import pytools.jira as pj
+
+assigned_to_me = pj.search(
+	'assignee=currentUser() AND status not in (Open,Done, Closed,\"Ready for Coverage Design\",\"Ready for Release\",\"Ready for Review\", \"Feature Test\", discarded, resolved, releasing, UAT, \"Ready for Regression / UAT\", \"Regression test\") ORDER BY key DESC, status DESC')
+if len(assigned_to_me) > 0:
+	pj.display(assigned_to_me, title="Assigned to me")
+
+my_acrs = pj.search(
+	'(assignee=currentUser() or reporter=currentUser()) AND project in (ACR) AND status not in (Closed,\"Waiting For Customer\",\"Ready for Coverage Design\",\"Ready for Release\",\"Ready for Review\", \"Feature Test\", discarded, resolved, releasing, UAT, \"Ready for Regression / UAT\", \"Regression test\") ORDER BY key DESC, status DESC')
+if len(my_acrs) > 0:
+	pj.display(my_acrs, title="My ACRs")
+
+open_csd = pj.search('project = CSD AND assignee in membersOf(bootham) AND resolution in (Unresolved) and created >= -12w ORDER BY created ASC')
+if len(open_csd) > 0:
+	pj.display(open_csd, title="Open CSDs")
+
+unassigned_csd = pj.search('assignee is EMPTY and project = CSD and created >= -1w AND resolution in (Unresolved) order by created DESC')
+if len(unassigned_csd) > 0:
+	pj.display(unassigned_csd, title="Unassigned CSDs")

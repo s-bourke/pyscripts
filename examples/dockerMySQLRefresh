@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+import os
+import re
+import subprocess
+
+from rich.progress import *
+
+import pydocker as pd
+
+"""
+Kill, rebuild and start a docker image. Takes db-schema project name as first argument and port binding as optional second argument.
+E.g:
+	dockerMySQLRefresh seymour-database-schema 33060
+
+"""
+
+console = Console()
+
+port = "33060"
+
+name = sys.argv[1]
+if len(sys.argv) > 2:
+	port = sys.argv[2]
+
+with console.status(f"[bold yellow]Building image [blue]{name}[/blue]...[/bold yellow]") as status:
+	if (pd.is_container_running(name)):
+		console.log(f'[bold yellow]Container [blue]{name}[/blue] is already running.')
+		status.update(f"[bold red]Killing container [blue]{name}[/blue]")
+		pd.kill_container(name)
+		console.log(f'[bold green]Container [blue]{name}[/blue] killed.')
+
+	status.update(f"[bold yellow]Building image [blue]{name}[/blue]")
+	pd.build_docker_image(name, '/home/sam/Workspace/' + name)
+	console.log(f'[bold green]Image [blue]{name}[/blue] built.')
+
+	status.update(f"[bold yellow]Starting container  [blue]{name}[/blue]")
+	pd.start_container(name, restart='unless-stopped', ports=[f"{port}:3306"])
+	console.log(f'[bold green]Container [blue]{name}[/blue] started.')
+
+	status.update(f"[bold yellow]Starting database server")
+	os.walk('/home/sam/Workspace/' + name + '/src/main/resources/db/migration/*')
+	listOfFiles = list()
+	for (dirpath, dirnames, filenames) in os.walk('/home/sam/Workspace/' + name + '/src/main/resources/db/migration'):
+		listOfFiles += [os.path.join(dirpath, file) for file in filenames]
+
+	versions = re.findall('V[\d]+_[\d]+.+\.sql', '\n'.join(listOfFiles))
+	versions.sort()
+
+	while 1 == 1:
+		result = str(subprocess.run(['docker', 'logs', name], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL))
+		running = re.findall('running\s\/docker-entrypoint-initdb\.d\/' + versions[0], result)
+		if len(running) > 0:
+			break
+
+	console.log(f"[bold green]Database server started")
+	for step in range(len(versions)):
+		status.update(f"[bold yellow]Loading: [blue]{versions[step]}[/blue]")
+		while 1 == 1:
+			result = str(subprocess.run(['docker', 'logs', name], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL))
+			running = re.findall('docker-entrypoint-initdb\.d\/' + versions[step], result)
+			if len(running) > 0:
+				break
+		console.log(f"[bold green]Loaded: [blue]{versions[step]}[/blue]")
+console.log(f"[bold green]Database [blue]{name}[/blue] started")
