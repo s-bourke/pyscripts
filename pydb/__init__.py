@@ -29,6 +29,7 @@ def get_connector(name):
 					port=connection["port"],
 					user=connection["user"],
 					password=connection["password"],
+					database=connection["schema"],
 					autocommit=True
 				)
 				break
@@ -115,7 +116,7 @@ def copy_data(table, source, dest, suffix=None, full_query=None, task=None, prog
 		result = query(f"SELECT * FROM {table} {suffix};", source)
 	else:
 		result = query(full_query, source)
-	thing = get_connector(dest).cursor()
+	connection = get_connector(dest).cursor()
 
 	insertHeaders = f"{result.headers}".replace("\'", "")
 
@@ -124,15 +125,14 @@ def copy_data(table, source, dest, suffix=None, full_query=None, task=None, prog
 		for _ in range(len(result.data[0]) - 1):
 			placeholder += ",%s"
 		placeholder += ")"
-
 		chunkyList = list(chunks(list(result.data), 100))
 		for x in range(len(chunkyList)):
-			thing.executemany(f"INSERT INTO {table} {insertHeaders} values {placeholder}", chunkyList[x])
+			connection.executemany(f"INSERT INTO {table} {insertHeaders} values {placeholder}", chunkyList[x])
 			if progress is not None:
 				progress.update(task, advance=100 / len(chunkyList))
 	if progress is not None:
 		progress.update(task, completed=100)
-	thing.close()
+	connection.close()
 
 
 def copy_group_data(tables, source, dest):
@@ -145,8 +145,7 @@ def copy_group_data(tables, source, dest):
 	"""
 	stringlen = len(max(tables, key=len))
 
-	for table in reversed(tables):
-		query(f"DELETE FROM {table}", dest)
+	clear_tables(reversed(tables), dest)
 
 	for tableGroup in list(chunks(list(tables), 8)):
 		with Progress() as progress:
@@ -156,6 +155,17 @@ def copy_group_data(tables, source, dest):
 			for task in tasks:
 				copy_data(task[1], source, dest, progress=progress, task=task[0])
 
+def clear_tables(tables, dest):
+	"""
+	Copy multiple tables from destination to source. This will delete the data in
+	te destination and populate from the source. Entire tables will be copied.
+	:param tables:  A list of the table names as strings. Must be in insert order.
+	:param source: The name of the source database from the config file
+	:param dest: The name of the destination database from the config file
+	"""
+
+	for table in tables:
+		query(f"DELETE FROM {table}", dest)
 
 def chunks(lst, n):
 	"""

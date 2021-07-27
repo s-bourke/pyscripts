@@ -8,7 +8,7 @@ def run_verbose(command, cwd=os.getcwd()):
 	"""
 	Run command line statement and print output to terminal
 	:param command: The command to be run
-	:param cwd: The directoy to run the command, if not the current directors
+	:param cwd: The directory to run the command, if not the current directors
 	"""
 	run(command, cwd=cwd)
 
