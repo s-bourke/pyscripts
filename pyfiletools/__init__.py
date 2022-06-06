@@ -1,12 +1,12 @@
 import pyfiletools.load
-import pyfiletools.parse
+import pyfiletools.parser
 import pyfiletools.write
 
 
 def parse(data_list, type="str"):
 	if type == "float":
-		return parse.pfloat(data_list)
+		return parser.pfloat(data_list)
 	elif type == "int":
-		return parse.pint(data_list)
+		return parser.pint(data_list)
 	else:
-		return parse.pstr(data_list)
+		return parser.pstr(data_list)

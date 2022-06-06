@@ -75,7 +75,7 @@ def __format_value(value, header):
 	if header.cell_style == "age_warning":
 		return __apply_age_warning(value, header.cell_style_context)
 	if header.cell_style == "reverse_age_warning":
-		return __apply_reverse_age_warning(value, header.cell_style_context)
+		return __apply_age_warning(value, header.cell_style_context, reverse=True)
 	return __default_cell_style + str(value)
 
 
@@ -108,30 +108,24 @@ def __apply_conditional(value, context):
 	return __default_cell_style + str(value)
 
 
-def __apply_age_warning(value, context):
+def __apply_age_warning(value, context, reverse=False):
 	"""
-	Apply colour formatting if date is over given amount in the past
+	Apply colour formatting if date is over given amount in the past, if reverse option selected
+	older dates will be green and younger ones will be red.
 	:param value: The value to be formatted
 	:param context: Age boundaries for highlighting First value if first age boundary,
 			second value is second boundary. E.g "7:28"
 	:return: The formatted value
 	"""
-	if dateutil.parser.isoparse(str(value)) < datetime.now() - timedelta(days=int(context.split(":")[1])):
-		return f"[red]{str(value)}"
-	if dateutil.parser.isoparse(str(value)) < datetime.now() - timedelta(days=int(context.split(":")[0])):
-		return f"[yellow]{str(value)}"
-	return f"[green]{str(value)}"
+	if reverse:
+		oldest = "[green]"
+		youngest = "[red]"
+	else:
+		oldest = "[red]"
+		youngest = "[green]"
 
-def __apply_reverse_age_warning(value, context):
-	"""
-	Apply colour formatting if date is over given amount in the past
-	:param value: The value to be formatted
-	:param context: Age boundaries for highlighting First value if first age boundary,
-			second value is second boundary. E.g "7:28"
-	:return: The formatted value
-	"""
 	if dateutil.parser.isoparse(str(value)) < datetime.now() - timedelta(days=int(context.split(":")[1])):
-		return f"[green]{str(value)}"
+		return f"{oldest}{str(value)}"
 	if dateutil.parser.isoparse(str(value)) < datetime.now() - timedelta(days=int(context.split(":")[0])):
 		return f"[yellow]{str(value)}"
-	return f"[red]{str(value)}"
+	return f"{youngest}{str(value)}"

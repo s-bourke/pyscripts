@@ -20,7 +20,7 @@ def float(filename):
 	Return 2d Array
 	filename: string pointing to file relative to current directory
 	"""
-	return ft.parse.pfloat(ft.load.file(filename))
+	return ft.parser.pfloat(ft.load.file(filename))
 
 
 def int(filename):
@@ -31,7 +31,7 @@ def int(filename):
 	Return 2d Array
 	filename: string pointing to file relative to current directory
 	"""
-	return ft.parse.pint(ft.load.file(filename))
+	return ft.parser.pint(ft.load.file(filename))
 
 
 def str(filename):
@@ -41,4 +41,4 @@ def str(filename):
 	Return 2d Array
 	filename: string pointing to file relative to current directory
 	"""
-	return ft.parse.pstr(ft.load.file(filename))
+	return ft.parser.pstr(ft.load.file(filename))
