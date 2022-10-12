@@ -34,9 +34,9 @@ def __get_jira():
     global __jira_client
 
     if __jira_client is None:
-        token = run_pipe("cat secret", cwd="/Users/sbourke/.jira.d").split("=", 1)[1]
+        token = run_pipe("cat secret", cwd="/Users/samuel.bourke/.jira.d").split("=", 1)[1]
 
-        config_file = parse(load.file("/Users/sbourke/.jira.d/config.yml"))
+        config_file = parse(load.file("/Users/samuel.bourke/.jira.d/config.yml"))
         config = defaultdict(list)
 
         for k, v in config_file:
